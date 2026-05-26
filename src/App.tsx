@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export default function App() {
   const initialPrizes = [
-    "Grupo A",
+    "Grupo A1",
     "Grupo B",
     "Grupo C",
     "Grupo D",
