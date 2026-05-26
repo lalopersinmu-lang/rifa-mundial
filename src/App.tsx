@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Wheel } from "react-custom-roulette";
 
 export default function App() {
   const initialPrizes = [
@@ -17,33 +18,40 @@ export default function App() {
   ];
 
   const [prizes, setPrizes] = useState(initialPrizes);
+
+  const [mustSpin, setMustSpin] = useState(false);
+
+  const [prizeNumber, setPrizeNumber] = useState(0);
+
   const [winner, setWinner] = useState("");
-  const [spinning, setSpinning] = useState(false);
+
+  const [userCode, setUserCode] = useState("");
+
+  useEffect(() => {
+    const path = window.location.pathname.replace("/", "");
+
+    setUserCode(path || "Invitado");
+  }, []);
+
+  const data = prizes.map((prize) => ({
+    option: prize,
+  }));
 
   const spinWheel = () => {
-    if (spinning) return;
+    if (mustSpin) return;
 
     if (prizes.length === 0) {
-      alert("Ya no quedan premios");
+      alert("Ya no quedan grupos");
       return;
     }
 
-    setSpinning(true);
+    const randomIndex = Math.floor(Math.random() * prizes.length);
 
-    setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * prizes.length);
-      const selectedPrize = prizes[randomIndex];
+    setPrizeNumber(randomIndex);
 
-      setWinner(selectedPrize);
+    setWinner(prizes[randomIndex]);
 
-      const updatedPrizes = prizes.filter(
-        (_, index) => index !== randomIndex
-      );
-
-      setPrizes(updatedPrizes);
-
-      setSpinning(false);
-    }, 3000);
+    setMustSpin(true);
   };
 
   return (
@@ -53,76 +61,76 @@ export default function App() {
         background: "#111",
         color: "white",
         display: "flex",
+        flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
         fontFamily: "Arial",
         padding: "20px",
       }}
     >
-      <div
+      <h1 style={{ fontSize: "48px", marginBottom: "10px" }}>
+        🎡 Mundial
+      </h1>
+
+      <h2 style={{ marginBottom: "30px" }}>
+        Bienvenido {userCode}
+      </h2>
+
+      <Wheel
+        mustStartSpinning={mustSpin}
+        prizeNumber={prizeNumber}
+        data={data}
+        backgroundColors={["#2563eb", "#1d4ed8"]}
+        textColors={["#ffffff"]}
+        outerBorderColor="#ffffff"
+        outerBorderWidth={10}
+        radiusLineColor="#ffffff"
+        radiusLineWidth={2}
+        onStopSpinning={() => {
+          const selectedPrize = prizes[prizeNumber];
+
+          const updatedPrizes = prizes.filter(
+            (_, index) => index !== prizeNumber
+          );
+
+          setPrizes(updatedPrizes);
+
+          setWinner(selectedPrize);
+
+          setMustSpin(false);
+        }}
+      />
+
+      <button
+        onClick={spinWheel}
         style={{
-          width: "100%",
-          maxWidth: "600px",
-          textAlign: "center",
+          marginTop: "40px",
+          padding: "20px 50px",
+          borderRadius: "20px",
+          border: "none",
+          fontSize: "24px",
+          cursor: "pointer",
+          fontWeight: "bold",
         }}
       >
-        <h1 style={{ fontSize: "48px" }}>🎡 Rifa</h1>
+        {mustSpin ? "Girando..." : "GIRAR"}
+      </button>
 
-        <button
-          onClick={spinWheel}
-          disabled={spinning}
-          style={{
-            padding: "20px 40px",
-            fontSize: "24px",
-            borderRadius: "20px",
-            border: "none",
-            cursor: "pointer",
-            marginTop: "20px",
-          }}
-        >
-          {spinning ? "Girando..." : "GIRAR"}
-        </button>
-
-        {winner && (
-          <div
-            style={{
-              marginTop: "30px",
-              background: "#222",
-              padding: "20px",
-              borderRadius: "20px",
-            }}
-          >
-            <h2>Ganaste:</h2>
-            <h1>{winner}</h1>
-          </div>
-        )}
-
+      {winner && (
         <div
           style={{
-            marginTop: "40px",
-            background: "#1b1b1b",
-            padding: "20px",
+            marginTop: "30px",
+            background: "#222",
+            padding: "20px 40px",
             borderRadius: "20px",
-            textAlign: "left",
+            textAlign: "center",
           }}
         >
-          <h2>Premios restantes:</h2>
+          <h2>Ganador:</h2>
 
-          {prizes.map((prize, index) => (
-            <div
-              key={index}
-              style={{
-                padding: "10px",
-                marginTop: "10px",
-                background: "#333",
-                borderRadius: "10px",
-              }}
-            >
-              {prize}
-            </div>
-          ))}
+          <h1>{winner}</h1>
         </div>
-      </div>
+      )}
     </div>
   );
 }
