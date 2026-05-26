@@ -1,58 +1,126 @@
-export default function RifaWheelApp() {
-  const prizes = [
-    "Premio 1",
-    "Premio 2",
-    "Premio 3",
-    "Premio 4",
-    "Premio 5",
-    "Premio 6",
-    "Premio 7",
-    "Premio 8",
-    "Premio 9",
-    "Premio 10",
-    "Premio 11",
-    "Premio 12",
+import { useState } from "react";
+
+export default function App() {
+  const initialPrizes = [
+    "Grupo A",
+    "Grupo B",
+    "Grupo C",
+    "Grupo D",
+    "Grupo E",
+    "Grupo F",
+    "Grupo G",
+    "Grupo H",
+    "Grupo I",
+    "Grupo J",
+    "Grupo K",
+    "Grupo L",
   ];
 
+  const [prizes, setPrizes] = useState(initialPrizes);
+  const [winner, setWinner] = useState("");
+  const [spinning, setSpinning] = useState(false);
+
+  const spinWheel = () => {
+    if (spinning) return;
+
+    if (prizes.length === 0) {
+      alert("Ya no quedan premios");
+      return;
+    }
+
+    setSpinning(true);
+
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      const selectedPrize = prizes[randomIndex];
+
+      setWinner(selectedPrize);
+
+      const updatedPrizes = prizes.filter(
+        (_, index) => index !== randomIndex
+      );
+
+      setPrizes(updatedPrizes);
+
+      setSpinning(false);
+    }, 3000);
+  };
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6">
-      <div className="max-w-2xl w-full text-center space-y-6">
-        <h1 className="text-5xl font-bold">Ruleta de Rifa</h1>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#111",
+        color: "white",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontFamily: "Arial",
+        padding: "20px",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "600px",
+          textAlign: "center",
+        }}
+      >
+        <h1 style={{ fontSize: "48px" }}>🎡 Rifa</h1>
 
-        <p className="text-zinc-300 text-lg">
-          Esta es una base para una ruleta donde cada usuario pueda girar una sola vez.
-        </p>
+        <button
+          onClick={spinWheel}
+          disabled={spinning}
+          style={{
+            padding: "20px 40px",
+            fontSize: "24px",
+            borderRadius: "20px",
+            border: "none",
+            cursor: "pointer",
+            marginTop: "20px",
+          }}
+        >
+          {spinning ? "Girando..." : "GIRAR"}
+        </button>
 
-        <div className="bg-zinc-900 rounded-3xl p-6 shadow-2xl border border-zinc-800">
-          <h2 className="text-2xl font-semibold mb-4">Premios disponibles</h2>
-
-          <div className="grid grid-cols-2 gap-3 text-left">
-            {prizes.map((prize, index) => (
-              <div
-                key={index}
-                className="bg-zinc-800 rounded-2xl p-3 border border-zinc-700"
-              >
-                {prize}
-              </div>
-            ))}
+        {winner && (
+          <div
+            style={{
+              marginTop: "30px",
+              background: "#222",
+              padding: "20px",
+              borderRadius: "20px",
+            }}
+          >
+            <h2>Ganaste:</h2>
+            <h1>{winner}</h1>
           </div>
+        )}
 
-          <button className="mt-6 w-full bg-white text-black font-bold py-4 rounded-2xl hover:scale-[1.01] transition-transform">
-            Girar Ruleta
-          </button>
-        </div>
+        <div
+          style={{
+            marginTop: "40px",
+            background: "#1b1b1b",
+            padding: "20px",
+            borderRadius: "20px",
+            textAlign: "left",
+          }}
+        >
+          <h2>Premios restantes:</h2>
 
-        <div className="bg-zinc-900 rounded-3xl p-6 border border-zinc-800 text-left space-y-3">
-          <h3 className="text-xl font-semibold">Funciones que se pueden agregar</h3>
-
-          <ul className="list-disc list-inside text-zinc-300 space-y-2">
-            <li>Login con Google o Discord</li>
-            <li>Solo 1 giro por usuario</li>
-            <li>Eliminar premios automáticamente</li>
-            <li>Guardar historial de ganadores</li>
-            <li>Compartir link público</li>
-            <li>Panel de administrador</li>
-          </ul>
+          {prizes.map((prize, index) => (
+            <div
+              key={index}
+              style={{
+                padding: "10px",
+                marginTop: "10px",
+                background: "#333",
+                borderRadius: "10px",
+              }}
+            >
+              {prize}
+            </div>
+          ))}
         </div>
       </div>
     </div>
